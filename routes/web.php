@@ -2,44 +2,59 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\SupervisorController;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/products', [ProductController::class, 'index'])->name('product.index');
+Route::get('/products-list', [ProductController::class, 'list'])->name('product.list');
 
-//*Authenticated Routes
-Route::middleware(['auth'])->group(function () {
+//* Authenticated Routes
+Route::middleware(['auth', 'verified'])->group(function () {
 
+    //* Profile
+    Route::prefix('profile')->name('profile.')->group(function () {
+        Route::get('/', [ProfileController::class, 'edit'])->name('edit');
+        Route::patch('/', [ProfileController::class, 'update'])->name('update');
+        Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
+    });
+
+    //* Dashboard
     Route::get('/dashboard', function () {
         return view('dashboard');
-    })->middleware(['auth', 'verified'])->name('dashboard');
+    })->name('dashboard');
 
-    //*Profile
-    Route::prefix('profile')->group(function () {
-        Route::get('/', [ProfileController::class, 'edit'])->name('profile.edit');
-        Route::patch('/', [ProfileController::class, 'update'])->name('profile.update');
-        Route::delete('/', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    //* Admin Routes
+    Route::middleware(['role:admin'])->group(function () {
+
+        Route::prefix('product')->name('product.')->group(function () {
+            Route::get('/', [ProductController::class, 'index'])->name('index');
+            Route::get('/create', [ProductController::class, 'create'])->name('create');
+            Route::get('/edit/{id}', [ProductController::class, 'edit'])->name('edit');
+            Route::post('/save', [ProductController::class, 'store'])->name('store');
+            Route::put('/update', [ProductController::class, 'update'])->name('update');
+            Route::delete('/delete/{product}', [ProductController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('user')->name('user.')->group(function () {
+            Route::get('/', [UserController::class, 'index'])->name('index');
+            Route::get('/create', [UserController::class, 'create'])->name('create');
+            Route::get('/edit/{id}', [UserController::class, 'edit'])->name('edit');
+            Route::post('/save', [UserController::class, 'store'])->name('store');
+            Route::put('/update', [UserController::class, 'update'])->name('update');
+            Route::delete('/delete/{product}', [UserController::class, 'destroy'])->name('destroy');
+        });
     });
 
-    //*Admin Routes
-    Route::prefix('admin')->middleware(['role:admin'])->name('admin.')->group(function () {
-        Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
+    //* Supervisor Routes
+    Route::middleware(['role:supervisor'])->group(function () {
     });
 
-    //*Supervisor Routes
-    Route::prefix('supervisor')->middleware(['role:supervisor'])->name('supervisor.')->group(function () {
-        Route::get('/dashboard', [SupervisorController::class, 'index'])->name('dashboard');
-    });
-
-    //*User Routes
-    Route::prefix('user')->middleware(['role:user'])->name('user.')->group(function () {
-        Route::get('/dashboard', [UserController::class, 'index'])->name('dashboard');
+    //* User Routes
+    Route::middleware(['role:user'])->group(function () {
     });
 });
 
