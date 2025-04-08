@@ -77,7 +77,7 @@
               <!-- Card Produk -->
               @foreach ($products as $item)
               <div class="w-sm lg:w-[calc(20%-0.5rem)] bg-gray-50 rounded-2xl shadow-md p-4 transition hover:shadow-lg">
-                <h2 class="text-xl font-semibold mb-2"> {{ $item->name }} </h2>
+                <h2 class="text-xl text-black font-semibold mb-2"> {{ $item->name }} </h2>
                 <p class="text-lg font-bold text-indigo-600 mb-1">Rp {{ number_format($item->price, 0, ',', '.') }}</p>
                 <p class="text-sm text-gray-500 mb-4">Stok: {{ $item->stock }}</p>
                 <button class="w-full bg-indigo-500 text-white px-3 py-2 rounded-lg hover:bg-indigo-600 text-sm">
@@ -88,7 +88,7 @@
               @endforeach
 
             </main>
-          </div>
+        </div>
 
         @if (Route::has('login'))
             <div class="h-14.5 hidden lg:block"></div>
