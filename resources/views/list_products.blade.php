@@ -41,7 +41,7 @@
                     </button>
 
                     <div x-show="open" @click.away="open = false" class="absolute z-50 mt-2 w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-md">
-                        <a href="{{ url('/products') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700">List Produk</a>
+                        <a href="{{ url('/products-list') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700">List Produk</a>
                     </div>
                 </div>
 
