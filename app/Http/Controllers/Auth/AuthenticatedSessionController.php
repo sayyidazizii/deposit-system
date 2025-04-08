@@ -31,11 +31,11 @@ class AuthenticatedSessionController extends Controller
         $user = Auth::user();
 
         if ($user->hasRole('admin')) {
-            return redirect()->route('admin.dashboard');
+            return redirect()->route('dashboard');
         } elseif ($user->hasRole('supervisor')) {
-            return redirect()->route('supervisor.dashboard');
+            return redirect()->route('dashboard');
         } elseif ($user->hasRole('user')) {
-            return redirect()->route('user.dashboard');
+            return redirect()->route('dashboard');
         }
 
         //*fallback tidak punya role
