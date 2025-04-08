@@ -6,11 +6,11 @@
             @endphp
 
             @if ($user->hasRole('admin'))
-                {{ __('Admin Dashboard') }}
+                {{ __('Client Area') }}
             @elseif ($user->hasRole('supervisor'))
-                {{ __('Supervisor Dashboard') }}
+                {{ __('Client') }}
             @elseif ($user->hasRole('user'))
-                {{ __('User Dashboard') }}
+                {{ __('Member Area') }}
             @else
                 {{ __('Dashboard') }}
             @endif
