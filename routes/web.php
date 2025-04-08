@@ -55,6 +55,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     //* User Routes
     Route::middleware(['role:user'])->group(function () {
+        Route::get('/products', [ProductController::class, 'all'])->name('product.all');
+        Route::get('/products/{id}', [ProductController::class, 'show'])->name('product.show');
+        Route::post('/products/{id}/buy', [ProductController::class, 'buy'])->name('product.buy');
     });
 });
 
