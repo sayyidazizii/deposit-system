@@ -68,7 +68,7 @@
                             <x-dropdown-link :href="route('dashboard')">
                                 {{ __('Riwayat Transaksi') }}
                             </x-dropdown-link>
-                            <x-dropdown-link :href="route('dashboard')">
+                            <x-dropdown-link :href="route('deposit.create')">
                                 {{ __('Top Up Saldo') }}
                             </x-dropdown-link>
                         </x-slot>

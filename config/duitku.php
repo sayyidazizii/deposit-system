@@ -1,7 +1,12 @@
 <?php
 
 return [
-    'merchant_code' => env('DUITKU_MERCHANT_CODE', 'DS12345'),
-    'api_key' => env('DUITKU_API_KEY', 'API_KEY_DARI_DUITKU'),
-    'sandbox' => env('DUITKU_SANDBOX', true),
+
+    'merchant_code' => env('DUITKU_MERCHANT_CODE'),
+    'api_key'       => env('DUITKU_API_KEY'),
+
+    'callback_url'  => env('DUITKU_CALLBACK_URL'),
+    'return_url'    => env('DUITKU_RETURN_URL'),
+
+    'env' => env('DUITKU_ENV', 'sandbox'),
 ];
