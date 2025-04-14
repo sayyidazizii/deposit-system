@@ -6,6 +6,7 @@ use App\Http\Controllers\DepositController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\TransactionController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -48,6 +49,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::put('/update', [UserController::class, 'update'])->name('update');
             Route::delete('/delete/{product}', [UserController::class, 'destroy'])->name('destroy');
         });
+
+        Route::post('/deposit/manual-callback/{depositId}', [DepositController::class, 'manualCallback'])->name('manual.callback');
     });
 
     //* Supervisor Routes
@@ -60,11 +63,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/products/{id}', [ProductController::class, 'show'])->name('product.show');
         Route::post('/products/{id}/buy', [ProductController::class, 'buy'])->name('product.buy');
 
-        Route::get('/deposit', [DepositController::class, 'create'])->name('deposit.create');
-        Route::post('/deposit', [DepositController::class, 'store'])->name('deposit.store');
+        Route::get('/deposit/history', [DepositController::class, 'history'])->name('deposit.history');
+        Route::get('/deposit/topup', [DepositController::class, 'create'])->name('deposit.create');
+        Route::post('/deposit/save', [DepositController::class, 'store'])->name('deposit.store');
+        Route::get('/deposit/show/{id}', [DepositController::class, 'show'])->name('deposit.show');
 
-        Route::get('/payment/redirect', [DepositController::class, 'redirect'])->name('payment.redirect');
+        Route::get('/transaction', [TransactionController::class, 'index'])->name('transactions.user');
+
+        Route::post('/cart/add/{id}', [TransactionController::class, 'add'])->name('cart.add');
+        Route::post('/cart/remove/{id}', [TransactionController::class, 'remove'])->name('cart.remove');
+        Route::post('/cart/checkout', [TransactionController::class, 'checkout'])->name('cart.checkout');
+
     });
+
+    Route::get('/deposit', [DepositController::class, 'index'])->name('deposit.index');
+    Route::get('/deposit/detail/{id}', [DepositController::class, 'show'])->name('deposit.detail');
+    Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
+    Route::get('/return', [DepositController::class, 'return'])->name('return');
 });
 
 require __DIR__.'/auth.php';

@@ -80,9 +80,7 @@
                 <h2 class="text-xl text-black font-semibold mb-2"> {{ $item->name }} </h2>
                 <p class="text-lg font-bold text-indigo-600 mb-1">Rp {{ number_format($item->price, 0, ',', '.') }}</p>
                 <p class="text-sm text-gray-500 mb-4">Stok: {{ $item->stock }}</p>
-                <button class="w-full bg-indigo-500 text-white px-3 py-2 rounded-lg hover:bg-indigo-600 text-sm">
-                  Beli
-                </button>
+
               </div>
 
               @endforeach

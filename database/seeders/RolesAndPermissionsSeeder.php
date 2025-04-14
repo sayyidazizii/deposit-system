@@ -30,6 +30,7 @@ class RolesAndPermissionsSeeder extends Seeder
         $admin = User::create([
             'name' => 'admin',
             'email' => 'admin@gmail.com',
+            'phone' => '085602678871',
             'password' => bcrypt('12345678'),
         ]);
         $admin->assignRole('admin');
@@ -37,6 +38,7 @@ class RolesAndPermissionsSeeder extends Seeder
         $user = User::create([
             'name' => 'user',
             'email' => 'user@gmail.com',
+            'phone' => '085602678871',
             'password' => bcrypt('12345678'),
         ]);
         $user->assignRole('user');
@@ -44,6 +46,7 @@ class RolesAndPermissionsSeeder extends Seeder
         $supervisor = User::create([
             'name' => 'supervisor',
             'email' => 'supervisor@gmail.com',
+            'phone' => '085602678871',
             'password' => bcrypt('12345678'),
         ]);
         $supervisor->assignRole('supervisor');

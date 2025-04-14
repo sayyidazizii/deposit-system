@@ -18,6 +18,11 @@ return new class extends Migration
             $table->decimal('cashback', 15, 2)->default(0);
             $table->enum('status', ['pending', 'paid', 'failed'])->default('pending');
             $table->string('payment_reference')->nullable();
+            $table->string('code_reference')->nullable();
+            $table->string('vaNumber')->nullable();
+            $table->string('qrString')->nullable();
+            $table->string('payment_url')->nullable();
+            $table->string('signature')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

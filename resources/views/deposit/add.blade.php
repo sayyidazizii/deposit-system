@@ -18,12 +18,18 @@
                         </div>
                     @endif
 
+                    @if (session('error'))
+                        <div class="bg-red-500 text-white p-4 rounded mb-4">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+
                     <form action="{{ route('deposit.store') }}" method="POST">
                         @csrf
 
                         <div class="mb-4">
-                            <label for="amount" class="block">Jumlah</label>
-                            <input type="number" name="amount" id="amount" class="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:focus:border-blue-400" required>
+                            <label for="amount" class="block">Jumlah (min 10.000)</label>
+                            <input type="number" name="amount" id="amount" class="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:focus:border-blue-400" placeholder="10000" min="10000" required>
                         </div>
 
                         <div class="mb-4">

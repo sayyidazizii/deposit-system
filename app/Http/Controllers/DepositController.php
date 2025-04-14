@@ -2,15 +2,30 @@
 namespace App\Http\Controllers;
 
 
+use App\Models\Wallet;
 use App\Models\Deposit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use AdityaDarma\LaravelDuitku\Facades\DuitkuAPI;
 
 class DepositController extends Controller
 {
+
+    public function index()
+    {
+        $deposits = Deposit::orderBy('created_at', 'desc')->get();
+        return view('deposit.index', compact('deposits'));
+    }
+
+    public function history()
+    {
+        $deposits = Deposit::where('user_id', Auth::id())->orderBy('created_at', 'desc')->get();
+        return view('deposit.history', compact('deposits'));
+    }
 
     public function create()
     {
@@ -23,7 +38,7 @@ class DepositController extends Controller
 
         $merchantCode = config('duitku.merchant_code');
         $apiKey = config('duitku.api_key');
-        $amount = 10000;
+        $amount = 10000; // Min amount
         $datetime = now()->format('Y-m-d H:i:s');
 
         $signature = hash('sha256', $merchantCode . $amount . $datetime . $apiKey);
@@ -38,6 +53,7 @@ class DepositController extends Controller
         ]);
 
         $data = $response->json();
+        // dd($data);
         return $data['paymentFee'] ?? [];
     }
 
@@ -48,6 +64,14 @@ class DepositController extends Controller
             'amount' => 'required|numeric|min:10000',
         ]);
 
+        if ($request->amount < 10000) {
+            return back()->with('error', 'Jumlah deposit minimal adalah 10.000');
+        }
+        elseif ($request->payment_reference == null) {
+            return back()->with('error', 'Silakan pilih metode pembayaran.');
+        }
+
+        DB::beginTransaction();
         try {
             $amount = $request->amount;
             $payment_reference = $request->payment_reference;
@@ -98,15 +122,33 @@ class DepositController extends Controller
             if ($response->successful()) {
                 $result = $response->json();
                 if (isset($result['paymentUrl'])) {
+                    $depositData = Deposit::find($merchantOrderId);
+                    $depositData->code_reference = $result['reference'];
+                    $depositData->vaNumber = $result['vaNumber'];
+                    $depositData->payment_url = $result['paymentUrl'];
+                    $depositData->signature = $signature;
+                    $depositData->save();
+                    log::info('Duitku Payment URL', [
+                        'merchantOrderId' => $merchantOrderId,
+                        'resutl' => $result,
+                    ]);
+                    // return $result['paymentUrl'];
+                    DB::commit();
                     return redirect($result['paymentUrl']);
                 } else {
                     return redirect('dashboard')->with('error', 'Gagal mendapatkan URL pembayaran.');
                 }
             } else {
-                return redirect('redirect')->with('error', 'Terjadi kesalahan saat memproses permintaan pembayaran.');
+                DB::rollBack();
+                Log::error('Duitku inquiry gagal', [
+                    'response' => $response->json(),
+                    'request' => $params,
+                ]);
+                return back()->with('error', 'Terjadi kesalahan saat memproses permintaan pembayaran, coba gunakan payment method lain.');
             }
 
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Gagal membuat transaksi Duitku', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
@@ -117,7 +159,13 @@ class DepositController extends Controller
         }
     }
 
-    public function redirect(Request $request)
+    public function show($id)
+    {
+        $deposit = Deposit::findOrFail($id);
+        return view('deposit.detail', compact('deposit'));
+    }
+
+    public function return(Request $request)
     {
         $merchantOrderId = $request->query('merchantOrderId');
         $reference = $request->query('reference');
@@ -144,9 +192,11 @@ class DepositController extends Controller
                 $deposit->save();
 
                 $transactionDetails = [
-                    'merchantOrderId' => $deposit->payment_reference,
+                    'merchantOrderId' => $deposit->id,
                     'amount' => $deposit->amount,
                     'cashback' => $deposit->cashback,
+                    'vaNumber' => $deposit->vaNumber,
+                    'payment_url' => $deposit->payment_url,
                     'paymentReference' => $reference,
                     'transactionTime' => $deposit->created_at->format('Y-m-d H:i:s'),
                     'paymentStatus' => $status,
@@ -165,5 +215,55 @@ class DepositController extends Controller
         return view('deposit.status', compact('message', 'status', 'transactionDetails'));
     }
 
+    public function manualCallback($id)
+    {
+        DB::beginTransaction();
+        try {
+            $deposit = Deposit::find($id);
+
+            $merchantOrderId = $deposit->id;
+            $statusCode = '00'; // Assuming paid code dari Duitku
+            $amount = $deposit->amount;
+            $signature = $deposit->signature;
+
+            if (!$deposit) {
+                Log::warning("Deposit not found. ID: {$merchantOrderId}");
+                return redirect('deposit')->with('error', 'Deposit not found');
+            }
+
+            if ($deposit->status === 'paid') {
+                Log::info("Deposit status paid. Skip. ID: {$deposit->id}");
+                return redirect('deposit')->with('error', 'Deposit sudah diproses');
+            }
+
+            if ($statusCode === '00') {
+                $deposit->status = 'paid';
+                $deposit->save();
+
+                $wallet = Wallet::firstOrCreate(['user_id' => $deposit->user_id]);
+                $wallet->increment('balance', $deposit->amount + $deposit->cashback);
+
+                Log::info("Manual Deposit success. ID: {$deposit->id}, User: {$deposit->user_id}, Total: " . ($deposit->amount + $deposit->cashback));
+            } else {
+                $deposit->status = 'failed';
+                $deposit->save();
+
+                Log::info("Manual Deposit failed. ID: {$deposit->id}, Status Code: {$statusCode}");
+                return redirect('deposit')->with('error', 'Manual Callback processed failed');
+            }
+            DB::commit();
+            return redirect('deposit')->with('success', 'Manual Callback processed successfully');
+            // return response()->json(['message' => 'Manual Callback processed successfully'], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error in Duitku callback', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'request' => $request->all(),
+            ]);
+            return redirect('deposit')->with('error', 'Manual Callback processed failed');
+            // return response()->json(['message' => 'Internal Server Error'], 500);
+        }
+    }
 
 }

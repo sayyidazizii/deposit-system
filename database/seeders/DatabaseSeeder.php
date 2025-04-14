@@ -7,7 +7,6 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 use Database\Seeders\WalletSeeder;
 use Database\Seeders\ProductSeeder;
-use Database\Seeders\TransactionSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 
 class DatabaseSeeder extends Seeder
@@ -27,7 +26,6 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RolesAndPermissionsSeeder::class,
             ProductSeeder::class,
-            TransactionSeeder::class,
             WalletSeeder::class,
         ]);
     }

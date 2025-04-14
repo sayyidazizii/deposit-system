@@ -10,42 +10,57 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex">
-                <!-- Logo -->
+               <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}">
                         <x-application-logo class="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" />
                     </a>
                 </div>
 
-                <!-- Navigation Links -->
+                <!-- Dashboard (semua role bisa lihat) -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
                 </div>
 
-                @if ($user->hasRole('user'))
+                <!-- Menu untuk User -->
+                @role('user')
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('product.all')" :active="request()->routeIs('product.all')">
                         {{ __('List Produk') }}
                     </x-nav-link>
                 </div>
-                @endif
+                @endrole
 
-                @if ($user->hasRole('admin'))
-                <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('product.index')" :active="request()->routeIs('product.index')">
-                        {{ __('Product') }}
-                    </x-nav-link>
-                </div>
-
+                <!-- Menu untuk Admin -->
+                @role('admin')
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('user.index')" :active="request()->routeIs('user.index')">
                         {{ __('User') }}
                     </x-nav-link>
                 </div>
-                @endif
+
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('product.index')" :active="request()->routeIs('product.index')">
+                        {{ __('Product') }}
+                    </x-nav-link>
+                </div>
+                @endrole
+
+                @hasanyrole('admin|supervisor')
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('deposit.index')" :active="request()->routeIs('deposit.index')">
+                        {{ __('Daftar Deposit') }}
+                    </x-nav-link>
+                </div>
+
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('transactions.index')" :active="request()->routeIs('transactions.index')">
+                        {{ __('Daftar Transaksi') }}
+                    </x-nav-link>
+                </div>
+                @endhasanyrole
 
             </div>
 
@@ -65,8 +80,11 @@
                         </x-slot>
 
                         <x-slot name="content">
-                            <x-dropdown-link :href="route('dashboard')">
+                            <x-dropdown-link :href="route('transactions.index')">
                                 {{ __('Riwayat Transaksi') }}
+                            </x-dropdown-link>
+                            <x-dropdown-link :href="route('deposit.history')">
+                                {{ __('Riwayat Deposit') }}
                             </x-dropdown-link>
                             <x-dropdown-link :href="route('deposit.create')">
                                 {{ __('Top Up Saldo') }}

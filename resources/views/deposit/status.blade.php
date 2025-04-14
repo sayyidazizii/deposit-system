@@ -39,6 +39,8 @@
                                 <h5>Detail Transaksi:</h5>
                                 <ul>
                                     <li><strong>Nomor Transaksi:</strong> {{ $transactionDetails['merchantOrderId'] }}</li>
+                                    <li><strong>Nomor VA:</strong> {{ $transactionDetails['vaNumber'] }}</li>
+                                    <li><strong>Link Pembayaran:</strong> {{ $transactionDetails['payment_url'] }}</li>
                                     <li><strong>Jumlah Pembayaran:</strong> Rp {{ number_format($transactionDetails['amount'], 0, ',', '.') }}</li>
                                     <li><strong>Cashback:</strong> Rp {{ number_format($transactionDetails['cashback'], 0, ',', '.') }}</li>
                                     <li><strong>Referensi Pembayaran:</strong> {{ $transactionDetails['paymentReference'] }}</li>
