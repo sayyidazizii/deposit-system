@@ -1,16 +1,21 @@
+# Deposit System
+Sistem deposit sederhana dengan integrasi payment gateway **Duitku**.
 
+## Fitur Login
+Berikut adalah akun untuk testing:
 
-# Nama Project
+### 👤 User
+- **Email**: `user@gmail.com`  
+- **Password**: `12345678`
 
-Deskripsi singkat tentang project ini.
+### 👤 Admin
+- **Email**: `admin@gmail.com`  
+- **Password**: `12345678`
 
-## Fitur
-- Fitur 1
-- Fitur 2
-- Fitur 3
+### 👤 Supervisor
+- **Email**: `supervisor@gmail.com`  
+- **Password**: `12345678`
 
-## Instalasi
-```bash
 ## Instalasi
 
 Clone repositori dan install dependensi:
@@ -20,12 +25,11 @@ git clone https://github.com/sayyidazizii/deposit-system.git
 cd deposit-system
 composer install
 cp .env.example .env
+php artisan migrate --seed
 php artisan key:generate
 
 npm install
 npm run dev
-
-
 
 
 
