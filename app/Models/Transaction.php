@@ -3,10 +3,11 @@
 namespace App\Models;
 
 use App\Models\User;
+use App\Models\Product;
+use App\Models\TransactionsItem;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Models\Product;
 
 class Transaction extends Model
 {
@@ -14,10 +15,9 @@ class Transaction extends Model
     use HasFactory,SoftDeletes;
     protected $fillable = [
         'user_id',
-        'product_id',
         'amount',
+        'transaction_number',
         'status',
-        'payment_reference',
         'created_at',
         'updated_at',
     ];
@@ -32,6 +32,10 @@ class Transaction extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+    public function items()
+    {
+        return $this->hasMany(TransactionsItem::class);
     }
     public function scopeFilter($query, array $filters)
     {
