@@ -22,15 +22,6 @@ class DuitkuController extends Controller
             $apiKey = config('duitku.api_key');
             $merchantCode = config('duitku.merchant_code');
 
-            $expectedSignature = md5($merchantCode . $merchantOrderId . $amount . $apiKey);
-
-            if ($signature !== $expectedSignature) {
-                Log::warning("Invalid signature on Duitku callback", [
-                    'expected' => $expectedSignature,
-                    'received' => $signature,
-                ]);
-                return response()->json(['message' => 'Invalid signature'], 403);
-            }
 
             $deposit = Deposit::find($merchantOrderId);
             if (!$deposit) {
