@@ -17,6 +17,7 @@ class Deposit extends Model
         'cashback',
         'status',
         'payment_reference',
+        'merchant_order_id',
         'created_at',
         'updated_at',
     ];

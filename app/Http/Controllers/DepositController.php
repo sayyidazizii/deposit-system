@@ -97,7 +97,7 @@ class DepositController extends Controller
 
             $merchantCode = config('duitku.merchant_code');
             $apiKey = config('duitku.api_key');
-            $merchantOrderId = $deposit->id;
+            $merchantOrderId = $deposit->id . '-' . now()->timestamp;
             $productDetails = 'Topup Saldo';
             $signature = md5($merchantCode . $merchantOrderId . $amount . $apiKey);
 
@@ -127,6 +127,7 @@ class DepositController extends Controller
                     $depositData->vaNumber = $result['vaNumber'];
                     $depositData->payment_url = $result['paymentUrl'];
                     $depositData->signature = $signature;
+                    $deposit->merchant_order_id = $merchantOrderId;
                     $depositData->save();
                     log::info('Duitku Payment URL', [
                         'merchantOrderId' => $merchantOrderId,
