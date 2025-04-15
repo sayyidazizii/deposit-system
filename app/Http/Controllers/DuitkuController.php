@@ -29,11 +29,6 @@ class DuitkuController extends Controller
                 return response()->json(['message' => 'Deposit not found'], 404);
             }
 
-            if ($deposit->status === 'paid') {
-                Log::info("Deposit status paid. Skip. ID: {$deposit->id}");
-                return response()->json(['message' => 'Already processed'], 200);
-            }
-
             if ($statusCode === '00') {
                 $deposit->status = 'paid';
                 $deposit->save();
